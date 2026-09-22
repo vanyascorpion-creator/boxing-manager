@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:17
+    container_name: boxing-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: boxing
+      POSTGRES_PASSWORD: boxing_password
+      POSTGRES_DB: boxing_manager
+    ports:
+      - "5432:5432"
+    volumes:
+      - boxing_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  boxing_postgres_data:
+  
