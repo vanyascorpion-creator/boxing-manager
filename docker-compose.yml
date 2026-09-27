@@ -4,14 +4,31 @@ services:
     container_name: boxing-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: boxing
-      POSTGRES_PASSWORD: boxing_password
-      POSTGRES_DB: boxing_manager
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - boxing_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U boxing -d boxing_manager"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public"
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   boxing_postgres_data:
-  
